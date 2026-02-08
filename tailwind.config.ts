@@ -18,6 +18,14 @@ const config = {
   		}
   	},
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-sans)', 'Nunito', 'Quicksand', 'sans-serif'],
+  			serif: ['var(--font-serif)', 'Merriweather', 'Georgia', 'serif'],
+  			mono: ['iA Writer Mono', 'Courier', 'monospace']
+  		},
+  		lineHeight: {
+  			relaxed: '1.65'
+  		},
   		colors: {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',

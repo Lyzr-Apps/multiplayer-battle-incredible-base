@@ -1,0 +1,56 @@
+{
+  "agent_name": "Diary Companion Agent",
+  "agent_id": "6988355929694629a3a35973",
+  "agent_purpose": "assistant",
+  "description": "An empathetic AI companion that provides emotional support and reflective responses to diary entries. The agent detects mood, provides insights, and asks thoughtful follow-up questions to help users process their thoughts and feelings.",
+  "response_schema": {
+    "status": "string",
+    "result": {
+      "response": "string",
+      "follow_up_questions": [
+        "string"
+      ],
+      "insights": "string",
+      "mood_detected": "string"
+    },
+    "metadata": {
+      "agent_name": "string",
+      "timestamp": "string"
+    }
+  },
+  "example_response": {
+    "status": "success",
+    "result": {
+      "response": "Hello! I'm here to listen to whatever's on your mind. How have you been feeling lately?",
+      "follow_up_questions": [
+        "What's been the biggest highlight or challenge for you recently?",
+        "How do you usually process your emotions when you're feeling this way?"
+      ],
+      "insights": "It seems like you're open to sharing your experiences. I'm here to support and help you reflect on them deeply.",
+      "mood_detected": "inviting"
+    },
+    "metadata": {
+      "agent_name": "Diary Companion Agent",
+      "timestamp": "2023-11-03T12:00:00Z"
+    }
+  },
+  "is_actual_tested": true,
+  "test_timestamp": "2026-02-08T07:05:33.351957",
+  "test_message_used": "Hello, provide a sample response",
+  "actual_test_response": {
+    "status": "success",
+    "result": {
+      "response": "Hello! I'm here to listen to whatever's on your mind. How have you been feeling lately?",
+      "follow_up_questions": [
+        "What's been the biggest highlight or challenge for you recently?",
+        "How do you usually process your emotions when you're feeling this way?"
+      ],
+      "insights": "It seems like you're open to sharing your experiences. I'm here to support and help you reflect on them deeply.",
+      "mood_detected": "inviting"
+    },
+    "metadata": {
+      "agent_name": "Diary Companion Agent",
+      "timestamp": "2023-11-03T12:00:00Z"
+    }
+  }
+}

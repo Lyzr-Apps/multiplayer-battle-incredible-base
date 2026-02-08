@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "input_node",
+      "type": "Input",
+      "label": "User Diary Entry",
+      "nodeCategory": "input"
+    },
+    {
+      "id": "diary_companion_agent",
+      "type": "Agent",
+      "label": "Diary Companion Agent",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "output_node",
+      "type": "Output",
+      "label": "Companion Response",
+      "nodeCategory": "end"
+    }
+  ],
+  "edges": [
+    {
+      "source": "input_node",
+      "target": "diary_companion_agent"
+    },
+    {
+      "source": "diary_companion_agent",
+      "target": "output_node"
+    }
+  ]
+}

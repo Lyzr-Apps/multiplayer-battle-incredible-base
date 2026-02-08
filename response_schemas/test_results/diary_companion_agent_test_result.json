@@ -1,0 +1,26 @@
+{
+  "agent_name": "Diary Companion Agent",
+  "agent_id": "6988355929694629a3a35973",
+  "test_message": "I can't stop worrying about my upcoming medical test results. I've been having trouble sleeping and my mind keeps going to worst-case scenarios. I know I should stay positive but it's so hard.",
+  "expected_purpose": "assistant",
+  "timestamp": "2026-02-08T07:05:16.702717",
+  "is_valid_json": true,
+  "validation_errors": [],
+  "actual_response": {
+    "status": "success",
+    "result": {
+      "response": "I'm so sorry to hear that you're feeling anxious and losing sleep over your medical test results. It's completely understandable to feel worried about something that's important to you. Sometimes our minds have a way of jumping to those worst-case scenarios, especially when we're facing uncertainty. Be gentle with yourself during this time. It might help to acknowledge these feelings as they come and perhaps find small ways to comfort or distract yourself.",
+      "follow_up_questions": [
+        "What techniques, if any, have you found helpful in managing anxiety in the past?",
+        "Is there a particular activity or thought that helps you find some peace, even temporarily?"
+      ],
+      "insights": "Feeling anxious about medical results is quite common and it's okay to experience this. Recognizing that you're doing your best to manage these feelings shows resilience. This might be an opportunity to practice mindfulness or self-care strategies.",
+      "mood_detected": "struggling"
+    },
+    "metadata": {
+      "agent_name": "Diary Companion Agent",
+      "timestamp": "2023-11-02T10:45:00Z"
+    }
+  },
+  "raw_response": "{\n  \"status\": \"success\",\n  \"result\": {\n    \"response\": \"I'm so sorry to hear that you're feeling anxious and losing sleep over your medical test results. It's completely understandable to feel worried about something that's important to you. Sometimes our minds have a way of jumping to those worst-case scenarios, especially when we're facing uncertainty. Be gentle with yourself during this time. It might help to acknowledge these feelings as they come and perhaps find small ways to comfort or distract yourself.\",\n    \"follow_up_questions\": [\n      \"What techniques, if any, have you found helpful in managing anxiety in the past?\",\n      \"Is there a particular activity or thought that helps you find some peace, even temporarily?\"\n    ],\n    \"insights\": \"Feeling anxious about medical results is quite common and it's okay to experience this. Recognizing that you're doing your best to manage these feelings shows resilience. This might be an opportunity to practice mindfulness or self-care strategies.\",\n    \"mood_detected\": \"struggling\"\n  },\n  \"metadata\": {\n    \"agent_name\": \"Diary Companion Agent\",\n    \"timestamp\": \"2023-11-02T10:45:00Z\"\n  }\n}"
+}

@@ -1,13 +1,22 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Nunito, Merriweather } from 'next/font/google'
 import './globals.css'
 import { IframeLoggerInit } from '@/components/IframeLoggerInit'
 
-const inter = Inter({ subsets: ['latin'] })
+const nunito = Nunito({
+  subsets: ['latin'],
+  variable: '--font-sans'
+})
+
+const merriweather = Merriweather({
+  weight: ['300', '400', '700'],
+  subsets: ['latin'],
+  variable: '--font-serif'
+})
 
 export const metadata: Metadata = {
-  title: 'Next.js App',
-  description: 'Built with Next.js, React, and Tailwind CSS',
+  title: 'Personal Diary AI Companion',
+  description: 'Your safe, private space for reflection and emotional support',
 }
 
 export default function RootLayout({
@@ -17,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${nunito.variable} ${merriweather.variable} font-sans`}>
         <IframeLoggerInit />
         {children}
       </body>

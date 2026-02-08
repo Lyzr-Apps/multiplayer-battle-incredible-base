@@ -1,0 +1,26 @@
+{
+  "workflow_name": "Personal Diary AI Companion",
+  "created_at": "2026-02-08",
+  "agents": [
+    {
+      "node_id": "diary_companion_agent",
+      "agent_id": "6988355929694629a3a35973",
+      "agent_name": "Diary Companion Agent",
+      "agent_type": "single",
+      "description": "An empathetic journaling companion that engages users in reflective conversation, asks thoughtful follow-up questions, validates emotions, helps process experiences, and provides gentle insights about patterns and growth.",
+      "provider": "OpenAI",
+      "model": "gpt-4o",
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "features": ["memory_enabled"],
+      "response_schema": "response_schemas/diary_companion_agent_response.json"
+    }
+  ],
+  "workflow_structure": {
+    "total_nodes": 3,
+    "total_edges": 2,
+    "flow_type": "linear",
+    "entry_point": "input_node",
+    "exit_point": "output_node"
+  }
+}
