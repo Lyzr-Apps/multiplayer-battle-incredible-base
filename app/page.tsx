@@ -5,7 +5,7 @@ import { callAIAgent } from '@/lib/aiAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Send, Menu, Search, X } from 'lucide-react'
+import { Loader2, Send, Menu, Search, X, Mic, Square } from 'lucide-react'
 import { FiCalendar, FiSmile, FiMeh, FiFrown, FiSun } from 'react-icons/fi'
 
 // TypeScript interfaces based on actual test responses
@@ -103,8 +103,14 @@ export default function Home() {
   const [currentEntryId, setCurrentEntryId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const [isTranscribing, setIsTranscribing] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -230,6 +236,105 @@ export default function Home() {
   const handleQuickPrompt = (prompt: string) => {
     setInput(prompt)
     textareaRef.current?.focus()
+  }
+
+  // Start voice recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mediaRecorder = new MediaRecorder(stream)
+      mediaRecorderRef.current = mediaRecorder
+      audioChunksRef.current = []
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data)
+        }
+      }
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        await transcribeAudio(audioBlob)
+
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop())
+      }
+
+      mediaRecorder.start()
+      setIsRecording(true)
+      setRecordingTime(0)
+
+      // Start recording timer
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1)
+      }, 1000)
+    } catch (error) {
+      console.error('Error accessing microphone:', error)
+      alert('Unable to access microphone. Please check permissions.')
+    }
+  }
+
+  // Stop voice recording
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop()
+      setIsRecording(false)
+
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current)
+        recordingIntervalRef.current = null
+      }
+    }
+  }
+
+  // Transcribe audio using OpenAI Whisper API
+  const transcribeAudio = async (audioBlob: Blob) => {
+    setIsTranscribing(true)
+    try {
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'recording.webm')
+
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Transcription failed')
+      }
+
+      const data = await response.json()
+
+      if (data.text) {
+        setInput(prev => prev + (prev ? '\n\n' : '') + data.text)
+        textareaRef.current?.focus()
+      }
+    } catch (error) {
+      console.error('Error transcribing audio:', error)
+      // Fallback: just add a note that recording was captured
+      setInput(prev => prev + (prev ? '\n\n' : '') + '[Voice recording captured - transcription unavailable]')
+    } finally {
+      setIsTranscribing(false)
+    }
+  }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current)
+      }
+      if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop()
+      }
+    }
+  }, [isRecording])
+
+  // Format recording time
+  const formatRecordingTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
   const loadEntry = (entry: DiaryEntry) => {
@@ -540,6 +645,25 @@ export default function Home() {
               </div>
             )}
 
+            {isRecording && (
+              <div className="mb-3 flex items-center justify-center gap-3 bg-accent/10 border border-accent rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-accent rounded-full animate-pulse" />
+                  <span className="text-sm font-medium text-foreground">Recording</span>
+                </div>
+                <span className="text-sm font-mono text-muted-foreground">
+                  {formatRecordingTime(recordingTime)}
+                </span>
+              </div>
+            )}
+
+            {isTranscribing && (
+              <div className="mb-3 flex items-center justify-center gap-3 bg-primary/10 border border-primary rounded-lg p-3">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span className="text-sm font-medium text-foreground">Transcribing your voice...</span>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <textarea
                 ref={textareaRef}
@@ -553,23 +677,43 @@ export default function Home() {
                 }}
                 placeholder="Share what's on your mind..."
                 rows={3}
-                className="flex-1 resize-none rounded-lg border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                disabled={isRecording || isTranscribing}
+                className="flex-1 resize-none rounded-lg border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ maxHeight: '144px', minHeight: '72px' }}
               />
-              <Button
-                onClick={handleSendMessage}
-                disabled={!input.trim() || isLoading}
-                className="self-end bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isLoading || isTranscribing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  className={isRecording ? "bg-accent hover:bg-accent/90" : "border-border hover:bg-secondary"}
+                  title={isRecording ? "Stop recording" : "Start voice recording"}
+                >
+                  {isRecording ? (
+                    <Square className="h-4 w-4" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!input.trim() || isLoading || isRecording || isTranscribing}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              Press Enter to send, Shift+Enter for new line
+              {isRecording
+                ? "Click the square button to stop recording"
+                : isTranscribing
+                ? "Converting your voice to text..."
+                : "Press Enter to send, Shift+Enter for new line, or use voice recording"}
             </p>
           </div>
         </div>
